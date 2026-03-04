@@ -14,25 +14,31 @@ dotenv.config();
 
 const app = express();
 
-// Allowed origins — add your Netlify URL as FRONTEND_URL in Render env vars
+// Allowed origins — set FRONTEND_URL in Render environment variables
 const allowedOrigins = [
-    process.env.FRONTEND_URL,          // e.g. https://your-site.netlify.app
-    'http://localhost:5173',            // local Vite dev
-    'http://localhost:3000',            // fallback
-].filter(Boolean);                     // removes undefined if env var not set
+    process.env.FRONTEND_URL,
+    'https://luxestay-hotel-booking.netlify.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+].filter(Boolean);
 
-app.use(cors({
+const corsOptions = {
     origin: (origin, callback) => {
-        // Allow requests with no origin (Postman, curl, server-to-server)
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error(`CORS: Origin ${origin} not allowed`));
         }
     },
-    credentials: true
-}));
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight for all routes
 app.use(express.json());
+
 
 // Routes
 app.use('/api/auth', authRoutes);
