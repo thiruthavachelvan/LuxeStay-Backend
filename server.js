@@ -11,8 +11,12 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const startReminderJob = require('./utils/reminderJob');
 
 const app = express();
+
+// Start Background Jobs
+startReminderJob();
 
 // CORS — allow all origins (reliable for deployment)
 app.use(cors({

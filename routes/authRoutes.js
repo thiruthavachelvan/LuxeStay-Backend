@@ -50,7 +50,8 @@ const {
     getCoupons,
     createCoupon,
     updateCoupon,
-    deleteCoupon
+    deleteCoupon,
+    sendSpecialOfferBlast
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const { createMembershipOrder, verifyMembershipPayment, getMyMembership } = require('../controllers/membershipController');
@@ -117,6 +118,9 @@ router.get('/admin/stats', protect, admin, getDashboardStats);
 router.put('/admin/bookings/:id/check-in', protect, admin, adminCheckInBooking);
 router.put('/admin/bookings/:id/check-out', protect, admin, adminCheckOutBooking);
 router.put('/admin/bookings/:id/cancel', protect, admin, adminCancelBooking);
+
+// --- Admin Marketing ---
+router.post('/admin/send-offer', protect, admin, sendSpecialOfferBlast);
 
 // --- Admin Coupon Routes ---
 router.get('/admin/coupons', protect, admin, getCoupons);

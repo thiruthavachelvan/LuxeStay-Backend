@@ -1,4 +1,6 @@
 // No top-level setApiKey call to prevent race conditions with dotenv
+const sgMail = require('@sendgrid/mail');
+const PDFDocument = require('pdfkit');
 
 
 /**
@@ -232,4 +234,26 @@ exports.sendSpecialOfferEmail = async (user, offerDetails) => {
         </div>
     `;
     await sendEmail({ to: user.email, subject: `Special Offer: ${offerDetails.title}`, html });
+};
+
+exports.sendStayReminderEmail = async (booking, user) => {
+    const html = `
+        <div style="font-family: 'serif'; background-color: #0f1626; color: #ffffff; padding: 40px; border: 2px gold solid;">
+            <h1 style="color: #d4af37; text-align: center;">Your Stay Starts Tomorrow!</h1>
+            <p>Dear ${user.fullName},</p>
+            <p>We are delighted to welcome you to <strong>LuxeStay</strong> tomorrow.</p>
+            <p>Everything is being prepared to ensure your stay is as luxurious and comfortable as possible.</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <p><strong>Check-in Date:</strong> ${new Date(booking.checkIn).toDateString()}</p>
+                <p><strong>Room Type:</strong> ${booking.room?.type || 'Standard Suite'}</p>
+                <p><strong>Location:</strong> ${booking.location?.city || 'Selected Branch'}</p>
+            </div>
+            <p>If you have any special requests or need transportation, please feel free to contact us through your dashboard.</p>
+            <div style="text-align: center;">
+                <a href="https://luxestay.com/dashboard" style="display: inline-block; padding: 15px 30px; background: #d4af37; color: #0f1626; text-decoration: none; font-weight: bold; border-radius: 5px;">View Your Dashboard</a>
+            </div>
+            <p style="margin-top: 40px; font-size: 12px; color: #888; text-align: center;">We look forward to seeing you soon!</p>
+        </div>
+    `;
+    await sendEmail({ to: user.email, subject: 'Reminder: Your LuxeStay reservation is tomorrow!', html });
 };
