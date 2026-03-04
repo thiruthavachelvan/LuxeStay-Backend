@@ -405,7 +405,7 @@ exports.clearUserNotifications = async (req, res) => {
 // @access  Private
 exports.createBooking = async (req, res) => {
     try {
-        const { roomId, locationId, checkIn, checkOut, guests, totalPrice, paymentStatus, paymentMethod, transactionId } = req.body;
+        const { roomId, locationId, checkIn, checkOut, guests, guestDetails, specialRequests, totalPrice, paymentStatus, paymentMethod, transactionId } = req.body;
 
         const booking = new Booking({
             user: req.user._id,
@@ -414,6 +414,8 @@ exports.createBooking = async (req, res) => {
             checkIn,
             checkOut,
             guests,
+            guestDetails,
+            specialRequests,
             totalPrice,
             paymentStatus,
             status: 'Confirmed'
@@ -531,3 +533,24 @@ exports.checkOutBooking = async (req, res) => {
     }
 };
 
+// @desc    Update guest details and special requests for a booking
+// @route   PUT /api/auth/bookings/:id/guest-details
+// @access  Private
+exports.saveGuestDetails = async (req, res) => {
+    try {
+        const { guestDetails, specialRequests } = req.body;
+        const booking = await Booking.findOne({ _id: req.params.id, user: req.user._id });
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        if (guestDetails) booking.guestDetails = guestDetails;
+        if (specialRequests !== undefined) booking.specialRequests = specialRequests;
+
+        const updatedBooking = await booking.save();
+        res.json(updatedBooking);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

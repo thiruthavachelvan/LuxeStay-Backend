@@ -18,7 +18,8 @@ const {
     settleBookingFolio,
     checkInBooking,
     checkOutBooking,
-    getAllBookings
+    getAllBookings,
+    saveGuestDetails
 } = require('../controllers/userController');
 const {
     createStaffAccount,
@@ -65,6 +66,7 @@ router.post('/bookings', protect, createBooking);
 router.get('/payment-history', protect, getPaymentHistory);
 router.get('/menu', protect, getMenuItems);
 router.put('/bookings/:id/cancel', protect, cancelBooking);
+router.put('/bookings/:id/guest-details', protect, saveGuestDetails);
 router.put('/bookings/:id/settle-folio', protect, settleBookingFolio);
 router.post('/food-order', protect, placeFoodOrder);
 router.get('/food-order', protect, getFoodOrders);

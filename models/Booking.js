@@ -37,6 +37,26 @@ const bookingSchema = new mongoose.Schema({
         adults: { type: Number, default: 1 },
         children: { type: Number, default: 0 }
     },
+    guestDetails: [{
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        gender: { type: String, required: true },
+        phone: { type: String },
+        email: { type: String },
+        idType: {
+            type: String,
+            required: function () { return this.type === 'adult'; }
+        },
+        idNumber: {
+            type: String,
+            required: function () { return this.type === 'adult'; }
+        },
+        type: { type: String, enum: ['adult', 'child'], required: true }
+    }],
+    specialRequests: {
+        type: String,
+        default: ''
+    },
     paymentStatus: {
         type: String,
         enum: ['Pending', 'Paid', 'Advance Paid'],
