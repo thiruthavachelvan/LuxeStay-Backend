@@ -464,9 +464,13 @@ exports.createBooking = async (req, res) => {
 
         // Trigger Booking Confirmation Email (Async)
         const populatedBooking = await Booking.findById(createdBooking._id)
-            .populate('user', 'fullName email')
-            .populate('location', 'city')
-            .populate('room', 'type');
+            .populate({
+                path: 'user',
+                select: 'fullName email phoneNumber membershipTier membership',
+                populate: { path: 'membership' }
+            })
+            .populate('location', 'city name')
+            .populate('room', 'type name');
         emailService.sendBookingConfirmation(populatedBooking);
 
         res.status(201).json(createdBooking);

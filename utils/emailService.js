@@ -1,6 +1,7 @@
 // No top-level setApiKey call to prevent race conditions with dotenv
 const sgMail = require('@sendgrid/mail');
 const PDFDocument = require('pdfkit');
+const path = require('path');
 
 
 /**
@@ -8,65 +9,167 @@ const PDFDocument = require('pdfkit');
  */
 const generateBookingPDF = (booking) => {
     return new Promise((resolve, reject) => {
-        const doc = new PDFDocument({ margin: 50 });
+        const doc = new PDFDocument({ margin: 50, size: 'A4' });
         const buffers = [];
         doc.on('data', buffers.push.bind(buffers));
         doc.on('end', () => resolve(Buffer.concat(buffers)));
 
-        // Header
-        doc.fillColor('#444444')
-            .fontSize(20)
-            .text('LuxeStay Resort & Spa', 110, 57)
-            .fontSize(10)
-            .text('123 Luxury Lane, Tropical Paradise', 200, 65, { align: 'right' })
-            .text('Contact: +1 234 567 890', 200, 80, { align: 'right' })
-            .moveDown();
+        const primaryColor = '#0f1626';
+        const accentColor = '#d4af37';
+        const textColor = '#333333';
+        const lightGray = '#f5f5f5';
 
-        // Line
-        doc.strokeColor('#aaaaaa').lineWidth(1).moveTo(50, 115).lineTo(550, 115).stroke();
+        // Background Header Box
+        doc.rect(0, 0, doc.page.width, 100).fill(primaryColor);
 
-        // Invoice Info
-        doc.fillColor('#444444')
-            .fontSize(14)
+        // Logo
+        try {
+            const logoPath = path.join(__dirname, '..', 'assets', 'logo.png');
+            doc.image(logoPath, 50, 20, { width: 60 });
+        } catch (err) {
+            console.warn('Logo not found, skipping.', err);
+        }
+
+        // Header Text
+        doc.fillColor(accentColor)
+            .font('Times-BoldItalic')
+            .fontSize(24)
+            .text('LuxeStay Resort & Spa', 125, 35);
+
+        doc.fillColor('#ffffff')
+            .font('Helvetica')
+            .fontSize(9)
+            .text('123 Luxury Lane, Tropical Paradise', 350, 40, { align: 'right', width: 200 })
+            .text('Contact: +1 234 567 890 | email: contact@luxestay.com', 250, 55, { align: 'right', width: 300 });
+
+        doc.moveDown(4);
+
+        // Invoice Title
+        doc.fillColor(primaryColor)
+            .font('Helvetica-Bold')
+            .fontSize(18)
             .text('Booking Confirmation & Invoice', 50, 130);
 
-        doc.fontSize(10)
-            .text(`Booking ID: ${booking._id}`, 50, 150)
-            .text(`Date: ${new Date().toLocaleDateString()}`, 50, 165)
-            .text(`Status: ${booking.status}`, 50, 180);
+        // Grid for IDs & Bill To
+        doc.fontSize(10).font('Helvetica');
+        const infoTop = 160;
+
+        doc.font('Helvetica-Bold').text('Booking Details', 50, infoTop);
+        doc.font('Helvetica')
+            .text(`Booking ID: ${booking._id}`, 50, infoTop + 15)
+            .text(`Date of Issue: ${new Date().toLocaleDateString()}`, 50, infoTop + 30)
+            .text(`Status: ${booking.status || 'Confirmed'}`, 50, infoTop + 45)
+            .text(`Payment: ${booking.paymentStatus || 'Paid/Advance'}`, 50, infoTop + 60);
+
+        doc.font('Helvetica-Bold').text('Bill To', 300, infoTop);
+        doc.font('Helvetica')
+            .text(booking.user?.fullName || 'Valued Guest', 300, infoTop + 15)
+            .text(booking.user?.email || '', 300, infoTop + 30)
+            .text(booking.user?.phoneNumber || '+ (Guest Phone)', 300, infoTop + 45);
+
+        // Stay Details
+        const stayTop = 240;
+        doc.rect(50, stayTop, 495, 20).fill(lightGray);
+        doc.fillColor(primaryColor).font('Helvetica-Bold').fontSize(12).text('Stay Details', 60, stayTop + 5);
+
+        doc.fillColor(textColor).font('Helvetica').fontSize(10);
+        doc.text(`Room Type: ${booking.room?.type || booking.room?.name || 'Luxury Suite'}`, 60, stayTop + 35);
+        doc.text(`Location: ${booking.location?.city || booking.location?.name || 'LuxeStay Branch'}`, 300, stayTop + 35);
+
+        const checkInStr = booking.checkIn ? new Date(booking.checkIn).toDateString() : 'TBD';
+        const checkOutStr = booking.checkOut ? new Date(booking.checkOut).toDateString() : 'TBD';
+        doc.text(`Check-in: ${checkInStr}`, 60, stayTop + 55);
+        doc.text(`Check-out: ${checkOutStr}`, 300, stayTop + 55);
 
         // Guest Details
-        doc.text('Bill To:', 300, 150)
-            .text(booking.user?.fullName || 'Valued Guest', 300, 165)
-            .text(booking.user?.email || '', 300, 180);
+        let contentTop = stayTop + 85;
+        doc.rect(50, contentTop, 495, 20).fill(lightGray);
+        doc.fillColor(primaryColor).font('Helvetica-Bold').fontSize(12).text(`Guests (${booking.guests?.adults || 1} Adults, ${booking.guests?.children || 0} Children)`, 60, contentTop + 5);
 
-        // Booking Snapshot
-        doc.moveDown(4);
-        doc.fontSize(12).text('Stay Details', 50, 220, { underline: true });
-        doc.fontSize(10);
-        doc.text(`Room Type: ${booking.room?.type || 'Standard'}`, 50, 240);
-        doc.text(`City: ${booking.location?.city || 'Selected Branch'}`, 50, 255);
-        doc.text(`Check-in: ${new Date(booking.checkIn).toLocaleDateString()}`, 50, 270);
-        doc.text(`Check-out: ${new Date(booking.checkOut).toLocaleDateString()}`, 50, 285);
+        doc.fillColor(textColor).font('Helvetica').fontSize(10);
+        contentTop += 35;
+        if (booking.guestDetails && booking.guestDetails.length > 0) {
+            booking.guestDetails.forEach((g, i) => {
+                doc.text(`${i + 1}. ${g.name} (${g.age} yrs, ${g.gender || 'N/A'})`, 60, contentTop);
+                contentTop += 15;
+            });
+        } else {
+            doc.text('Primary Guest Record.', 60, contentTop);
+            contentTop += 15;
+        }
+
+        // Exclusive Benefits
+        if (booking.user?.membershipTier && booking.user.membershipTier !== 'None') {
+            contentTop += 10;
+            doc.rect(50, contentTop, 495, 20).fill(lightGray);
+            doc.fillColor(accentColor).font('Helvetica-Bold').fontSize(12).text(`${booking.user.membershipTier} Member Privileges`, 60, contentTop + 5);
+            doc.fillColor(textColor).font('Helvetica').fontSize(10);
+            contentTop += 35;
+
+            if (booking.user.membership && booking.user.membership.benefits && booking.user.membership.benefits.length > 0) {
+                booking.user.membership.benefits.forEach(b => {
+                    doc.text(`• ${b}`, 60, contentTop);
+                    contentTop += 15;
+                });
+            } else {
+                // Default fallback
+                doc.text('• Priority Check-in & Dedicated Concierge Access', 60, contentTop);
+                contentTop += 15;
+                if (['Gold', 'Platinum', 'Diamond', 'Black Card'].includes(booking.user.membershipTier)) {
+                    doc.text('• Complimentary Spa Voucher & Late Checkout', 60, contentTop);
+                    contentTop += 15;
+                }
+            }
+        }
 
         // Pricing Table
-        const tableTop = 320;
-        doc.fontSize(10).fillColor('#444444');
-        doc.text('Description', 50, tableTop, { bold: true });
-        doc.text('Amount (INR)', 400, tableTop, { align: 'right', bold: true });
+        contentTop += 15;
+        doc.rect(50, contentTop, 495, 20).fill(primaryColor);
+        doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(10);
+        doc.text('Description', 60, contentTop + 5);
+        doc.text('Amount (INR)', 450, contentTop + 5, { align: 'right' });
 
-        doc.strokeColor('#eeeeee').lineWidth(1).moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+        doc.fillColor(textColor).font('Helvetica');
+        contentTop += 35;
 
-        doc.text(`Accommodation Charges (${booking.room?.type || 'Room'})`, 50, tableTop + 30);
-        doc.text(`Rs ${booking.totalPrice.toLocaleString('en-IN')}`, 400, tableTop + 30, { align: 'right' });
+        // Base Room Price calculation
+        let originalPrice = booking.originalPrice || booking.totalPrice;
+        if (!booking.originalPrice && booking.discountAmount) originalPrice += booking.discountAmount;
+        if (booking.addOns && booking.addOns.length > 0) {
+            let addOnTotal = booking.addOns.reduce((sum, a) => sum + (a.price || 0), 0);
+            originalPrice -= addOnTotal;
+        }
 
-        doc.strokeColor('#aaaaaa').lineWidth(1).moveTo(50, tableTop + 50).lineTo(550, tableTop + 50).stroke();
+        doc.text(`Accommodation Charges (${booking.room?.type || booking.room?.name || 'Room'})`, 60, contentTop);
+        doc.text(`Rs ${Math.max(0, originalPrice).toLocaleString('en-IN')}`, 450, contentTop, { align: 'right' });
+        contentTop += 20;
 
-        doc.fontSize(12).text('Total Amount:', 300, tableTop + 70);
-        doc.text(`Rs ${booking.totalPrice.toLocaleString('en-IN')}`, 400, tableTop + 70, { align: 'right', bold: true });
+        // Add Ons
+        if (booking.addOns && booking.addOns.length > 0) {
+            booking.addOns.forEach(addon => {
+                doc.text(`Add-On: ${addon.name}`, 60, contentTop);
+                doc.text(`Rs ${(addon.price || 0).toLocaleString('en-IN')}`, 450, contentTop, { align: 'right' });
+                contentTop += 20;
+            });
+        }
+
+        // Discounts
+        if (booking.discountAmount > 0) {
+            doc.fillColor('#d9534f');
+            doc.text(`Discount Applied ${booking.couponCode ? '(' + booking.couponCode + ')' : ''}`, 60, contentTop);
+            doc.text(`- Rs ${booking.discountAmount.toLocaleString('en-IN')}`, 450, contentTop, { align: 'right' });
+            contentTop += 20;
+            doc.fillColor(textColor);
+        }
+
+        doc.strokeColor('#cccccc').lineWidth(1).moveTo(50, contentTop).lineTo(545, contentTop).stroke();
+        contentTop += 15;
+
+        doc.font('Helvetica-Bold').fontSize(12).text('Total Paid/Payable:', 200, contentTop, { align: 'right', width: 230 });
+        doc.fillColor(primaryColor).text(`Rs ${(booking.totalPrice || 0).toLocaleString('en-IN')}`, 440, contentTop, { align: 'right' });
 
         // Footer
-        doc.fontSize(10).font('Helvetica-Oblique').text('Thank you for choosing LuxeStay. We look forward to your arrival!', 50, 700, { align: 'center' });
+        doc.fillColor(accentColor).font('Times-Italic').fontSize(14).text('Thank you for choosing LuxeStay. We look forward to your arrival!', 50, doc.page.height - 80, { align: 'center' });
 
         doc.end();
     });
@@ -77,24 +180,92 @@ const generateBookingPDF = (booking) => {
  */
 const generateFoodOrderPDF = (order) => {
     return new Promise((resolve, reject) => {
-        const doc = new PDFDocument({ margin: 50 });
+        const doc = new PDFDocument({ margin: 50, size: 'A4' });
         const buffers = [];
         doc.on('data', buffers.push.bind(buffers));
         doc.on('end', () => resolve(Buffer.concat(buffers)));
 
-        doc.fontSize(20).text('LuxeStay In-Room Dining', { align: 'center' });
-        doc.moveDown();
-        doc.fontSize(10).text(`Order ID: ${order._id}`);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`);
-        doc.moveDown();
+        const primaryColor = '#0f1626';
+        const accentColor = '#d4af37';
+        const textColor = '#333333';
+        const lightGray = '#f5f5f5';
 
-        doc.text('Item Breakdown:', { underline: true });
-        order.items.forEach(item => {
-            doc.text(`${item.name} x ${item.quantity} - Rs ${(item.price * item.quantity).toLocaleString()}`);
-        });
+        // Background Header Box
+        doc.rect(0, 0, doc.page.width, 100).fill(primaryColor);
 
-        doc.moveDown();
-        doc.fontSize(12).text(`Total Paid: Rs ${order.totalAmount.toLocaleString()}`, { bold: true });
+        // Logo
+        try {
+            const logoPath = path.join(__dirname, '..', 'assets', 'logo.png');
+            doc.image(logoPath, 50, 20, { width: 60 });
+        } catch (err) {
+            console.warn('Logo not found, skipping.');
+        }
+
+        // Header Text
+        doc.fillColor(accentColor)
+            .font('Times-BoldItalic')
+            .fontSize(28)
+            .text('LuxeStay Resort & Spa', 120, 35);
+
+        doc.fillColor('#ffffff')
+            .font('Helvetica')
+            .fontSize(10)
+            .text('In-Room Dining Services', 50, 40, { align: 'right' })
+            .text('Contact: +1 234 567 890 | email: dining@luxestay.com', 50, 55, { align: 'right' });
+
+        doc.moveDown(4);
+
+        // Invoice Title
+        doc.fillColor(primaryColor)
+            .font('Helvetica-Bold')
+            .fontSize(18)
+            .text('Food & Beverage Invoice', 50, 130);
+
+        doc.fontSize(10).font('Helvetica');
+        const infoTop = 160;
+
+        doc.font('Helvetica-Bold').text('Order Details', 50, infoTop);
+        doc.font('Helvetica')
+            .text(`Order ID: ${order._id}`, 50, infoTop + 15)
+            .text(`Date of Issue: ${new Date().toLocaleDateString()}`, 50, infoTop + 30)
+            .text(`Room Number: ${order.roomNumber || 'N/A'}`, 50, infoTop + 45)
+            .text(`Status: ${order.status || 'Delivered'}`, 50, infoTop + 60);
+
+        // Pricing Table
+        let contentTop = 250;
+        doc.rect(50, contentTop, 495, 20).fill(primaryColor);
+        doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(10);
+        doc.text('Item Description', 60, contentTop + 5);
+        doc.text('Qty', 350, contentTop + 5, { align: 'center', width: 40 });
+        doc.text('Amount (INR)', 450, contentTop + 5, { align: 'right' });
+
+        doc.fillColor(textColor).font('Helvetica');
+        contentTop += 35;
+
+        let totalSurcharge = 0;
+        if (order.items && order.items.length > 0) {
+            order.items.forEach((item, index) => {
+                doc.text(`${item.name}`, 60, contentTop);
+                doc.text(`${item.quantity}`, 350, contentTop, { align: 'center', width: 40 });
+                doc.text(`Rs ${(item.price * item.quantity).toLocaleString('en-IN')}`, 450, contentTop, { align: 'right' });
+                contentTop += 20;
+
+                // Add pagination protection
+                if (contentTop > 700) {
+                    doc.addPage();
+                    contentTop = 50;
+                }
+            });
+        }
+
+        doc.strokeColor('#cccccc').lineWidth(1).moveTo(50, contentTop).lineTo(545, contentTop).stroke();
+        contentTop += 15;
+
+        doc.font('Helvetica-Bold').fontSize(12).text('Total Amount Paid:', 200, contentTop, { align: 'right', width: 230 });
+        doc.fillColor(primaryColor).text(`Rs ${(order.totalAmount || 0).toLocaleString('en-IN')}`, 440, contentTop, { align: 'right' });
+
+        // Footer
+        doc.fillColor(accentColor).font('Times-Italic').fontSize(14).text('Thank you for dining with LuxeStay!', 50, doc.page.height - 80, { align: 'center' });
 
         doc.end();
     });
