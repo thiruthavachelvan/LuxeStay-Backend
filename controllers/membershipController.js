@@ -64,7 +64,7 @@ const createMembershipOrder = async (req, res) => {
             });
             return res.status(200).json({ success: true, order: razorpayOrder });
         } catch (rzpError) {
-            console.warn('Razorpay API error, falling back to mock:', rzpError.message);
+            console.warn('Razorpay API error, falling back to mock:', rzpError?.message || rzpError?.description || rzpError || 'Unknown error');
             return res.status(200).json({ success: true, order: mockOrder() });
         }
 
