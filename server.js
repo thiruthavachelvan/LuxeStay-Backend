@@ -14,8 +14,24 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Allowed origins — add your Netlify URL as FRONTEND_URL in Render env vars
+const allowedOrigins = [
+    process.env.FRONTEND_URL,          // e.g. https://your-site.netlify.app
+    'http://localhost:5173',            // local Vite dev
+    'http://localhost:3000',            // fallback
+].filter(Boolean);                     // removes undefined if env var not set
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (Postman, curl, server-to-server)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error(`CORS: Origin ${origin} not allowed`));
+        }
+    },
+    credentials: true
+}));
 app.use(express.json());
 
 // Routes
