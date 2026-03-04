@@ -609,27 +609,36 @@ exports.addSpaToBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const { amount, transactionId } = req.body;
-        const booking = await Booking.findOne({ _id: id, user: req.user._id });
+        const booking = await Booking.findOne({ _id: id, user: req.user._id })
+            .populate('user', 'fullName email')
+            .populate('location', 'city');
 
+        console.log('--- ADD SPA DEBUG ---');
+        console.log('Booking found:', !!booking);
         if (!booking) {
+            console.log('No booking found for ID:', id, 'and User:', req.user._id);
             return res.status(404).json({ message: 'Booking not found' });
         }
+        console.log('User:', booking.user?.email);
+        console.log('Amount:', amount);
 
         const hasSpa = booking.addOns.some(a => a.name.toLowerCase().includes('spa'));
-        if (hasSpa) {
-            return res.status(400).json({ message: 'Spa service already added to this booking' });
+
+        if (!hasSpa) {
+            console.log('Adding new Spa add-on to booking...');
+            // Add spa to addOns
+            booking.addOns.push({
+                name: 'Spa Session (60 min)',
+                price: amount,
+                usageStatus: 'unused'
+            });
+
+            // Update total price
+            booking.totalPrice += amount;
+            await booking.save();
+        } else {
+            console.log('Spa add-on already exists, proceeding to create Support Request only.');
         }
-
-        // Add spa to addOns
-        booking.addOns.push({
-            name: 'Spa Session (60 min)',
-            price: amount,
-            usageStatus: 'unused'
-        });
-
-        // Update total price
-        booking.totalPrice += amount;
-        await booking.save();
 
         // Record payment
         const payment = new Payment({
@@ -642,15 +651,45 @@ exports.addSpaToBooking = async (req, res) => {
         });
         await payment.save();
 
+        console.log('Support Query Creating...');
+        const Support = require('../models/Support');
+        const supportQuery = await Support.create({
+            user: booking.user._id,
+            location: booking.location?._id,
+            subject: 'Spa Appointment Request',
+            message: `Payment received for Spa Session (₹${amount}). Please coordinate with guest ${booking.user.fullName || booking.user.email} (Booking #${booking._id.toString().slice(-6)}) to schedule their appointment.`,
+            status: 'Open',
+            priority: 'Urgent'
+        });
+        console.log('Support Query Created:', supportQuery._id);
+
+        const { sendSpaPurchaseEmail } = require('../utils/emailService');
+        await sendSpaPurchaseEmail(booking.user, booking, amount, payment.transactionId);
+        console.log('Email Sent (Triggered)');
+
+        // Notify Admin
+        console.log('Admin Notification Creating...');
+        const Notification = require('../models/Notification');
+        await Notification.create({
+            type: 'Service Request',
+            category: 'query',
+            recipientRole: 'admin',
+            message: `New Spa Appointment Request from ${booking.user.email || 'Guest'} (Booking #${booking._id.toString().slice(-6)})`,
+            status: 'Urgent'
+        });
+        console.log('Admin Notification Created');
+
         await Notification.create({
             user: req.user._id,
             recipientRole: 'user',
             type: 'System',
-            message: `Spa treatment added to your booking #${booking._id.toString().slice(-6)}. Our team will contact you for scheduling.`
+            message: `Spa treatment added to your booking #${booking._id.toString().slice(-6)}. You have been emailed the bill. Our team will contact you for scheduling.`
         });
+        console.log('User Notification Created');
 
         res.json({ message: 'Spa added successfully', booking });
     } catch (error) {
+        console.error('ADD SPA ERROR:', error);
         res.status(500).json({ message: error.message });
     }
 };

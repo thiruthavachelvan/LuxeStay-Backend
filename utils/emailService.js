@@ -257,3 +257,22 @@ exports.sendStayReminderEmail = async (booking, user) => {
     `;
     await sendEmail({ to: user.email, subject: 'Reminder: Your LuxeStay reservation is tomorrow!', html });
 };
+
+exports.sendSpaPurchaseEmail = async (user, booking, amount, transactionId) => {
+    const html = `
+        <div style="font-family: 'sans-serif'; color: #333; max-width: 600px; margin: auto; border: 1px solid #d4af37; padding: 40px; background-color: #0f1626; color: #ffffff;">
+            <h2 style="color: #d4af37; font-style: italic; text-align: center;">Spa & Wellness Confirmation</h2>
+            <p>Dear ${user.fullName},</p>
+            <p>Thank you for booking a rejuvenating Spa Session with LuxeStay. We have received your payment.</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <p><strong>Booking Reference:</strong> #${booking._id.toString().slice(-6)}</p>
+                <p><strong>Transaction ID:</strong> ${transactionId}</p>
+                <p><strong>Service:</strong> Spa Session (60 min)</p>
+                <h3 style="color: #d4af37;">Amount Paid: ₹${amount.toLocaleString('en-IN')}</h3>
+            </div>
+            <p>Our wellness concierge has been notified and will coordinate with you to schedule your exact preferred time during your stay.</p>
+            <p style="margin-top: 40px; font-size: 12px; color: #888; text-align: center;">Warm Regards,<br>LuxeStay Spa Team</p>
+        </div>
+    `;
+    await sendEmail({ to: user.email, subject: 'LuxeStay: Spa Booking Invoice', html });
+};

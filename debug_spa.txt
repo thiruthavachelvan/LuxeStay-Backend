@@ -1,0 +1,21 @@
+[dotenv@17.3.1] injecting env (7) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+Connected to DB
+
+--- Recent Support Queries ---
+ID: 69a86ade9ac9805fbd5c72bd, Subject: Spa Appointment, Status: Resolved, User: anirudh@luxestays.com, CreatedAt: Wed Mar 04 2026 22:54:46 GMT+0530 (India Standard Time)
+ID: 69a862c992cfabf650b04cd0, Subject: Spa Appointment, Status: Resolved, User: thiruthavachelvan@gmail.com, CreatedAt: Wed Mar 04 2026 22:20:17 GMT+0530 (India Standard Time)
+ID: 69a8607592cfabf650b04ba5, Subject: Spa Appointment, Status: Resolved, User: thiruthavachelvan@gmail.com, CreatedAt: Wed Mar 04 2026 22:10:21 GMT+0530 (India Standard Time)
+ID: 69a84e0bb283547d0fe4eb71, Subject: Spa Appointment, Status: Resolved, User: praveensubbu99@gmail.com, CreatedAt: Wed Mar 04 2026 20:51:47 GMT+0530 (India Standard Time)
+ID: 69a7475c98d2b9b37fdbec65, Subject: Spa Appointment, Status: Resolved, User: sabeeranwermeeran@gmail.com, CreatedAt: Wed Mar 04 2026 02:11:00 GMT+0530 (India Standard Time)
+
+--- Recent Admin Notifications ---
+ID: 69a88080909b170bc81a9f43, Type: User Login, Message: Member admin@luxestay.com has signed into the portal., CreatedAt: Thu Mar 05 2026 00:27:04 GMT+0530 (India Standard Time)
+ID: 69a878e79ac9805fbd5c75e5, Type: User Login, Message: Member praveensubbu99@gmail.com has signed into the portal., CreatedAt: Wed Mar 04 2026 23:54:39 GMT+0530 (India Standard Time)
+ID: 69a86ade9ac9805fbd5c72bf, Type: Service Request, Message: New service request from anirudh@luxestays.com: Spa Appointment, CreatedAt: Wed Mar 04 2026 22:54:46 GMT+0530 (India Standard Time)
+ID: 69a86ad69ac9805fbd5c7288, Type: User Login, Message: Member anirudh@luxestays.com has signed into the portal., CreatedAt: Wed Mar 04 2026 22:54:38 GMT+0530 (India Standard Time)
+ID: 69a863e18cd15374da195713, Type: User Login, Message: Member tony.stark@luxestays.com has signed into the portal., CreatedAt: Wed Mar 04 2026 22:24:57 GMT+0530 (India Standard Time)
+
+--- Recent Spa Add-ons in Bookings ---
+BookingID: 69a84c1bb283547d0fe4eab8, User: praveensubbu99@gmail.com, AddOns: ["Spa Session (60 min)"], UpdatedAt: Thu Mar 05 2026 00:12:23 GMT+0530 (India Standard Time)
+BookingID: 69a816277fc0cb3841317d95, User: anirudh@luxestays.com, AddOns: ["Spa Session (60 min)"], UpdatedAt: Wed Mar 04 2026 23:02:16 GMT+0530 (India Standard Time)
+BookingID: 69a85fef92cfabf650b04ad1, User: thiruthavachelvan@gmail.com, AddOns: ["Spa Session (60 min)","Minibar Refill (Daily)","Evening Cocktails"], UpdatedAt: Wed Mar 04 2026 22:14:58 GMT+0530 (India Standard Time)
