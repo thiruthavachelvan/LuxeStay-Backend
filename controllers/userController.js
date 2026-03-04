@@ -413,7 +413,7 @@ exports.clearUserNotifications = async (req, res) => {
 // @access  Private
 exports.createBooking = async (req, res) => {
     try {
-        const { roomId, locationId, checkIn, checkOut, guests, guestDetails, specialRequests, totalPrice, paymentStatus, paymentMethod, transactionId } = req.body;
+        const { roomId, locationId, checkIn, checkOut, guests, guestDetails, specialRequests, totalPrice, paymentStatus, paymentMethod, transactionId, addOns } = req.body;
 
         const booking = new Booking({
             user: req.user._id,
@@ -426,6 +426,7 @@ exports.createBooking = async (req, res) => {
             specialRequests,
             totalPrice,
             paymentStatus,
+            addOns: addOns || [],
             status: 'Confirmed'
         });
 
@@ -566,6 +567,89 @@ exports.saveGuestDetails = async (req, res) => {
 
         const updatedBooking = await booking.save();
         res.json(updatedBooking);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Mark an amenity as used
+// @route   PUT /api/auth/bookings/:id/amenities/:amenityName/use
+// @access  Private
+exports.updateAmenityUsage = async (req, res) => {
+    try {
+        const { id, amenityName } = req.params;
+        const booking = await Booking.findOne({ _id: id, user: req.user._id });
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        const amenity = booking.addOns.find(a => a.name === amenityName);
+        if (!amenity) {
+            return res.status(404).json({ message: 'Amenity not found in this booking' });
+        }
+
+        if (amenity.usageStatus === 'used') {
+            return res.status(400).json({ message: 'Amenity already used' });
+        }
+
+        amenity.usageStatus = 'used';
+        await booking.save();
+
+        res.json({ message: `${amenityName} marked as used`, booking });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Add spa to an existing booking
+// @route   PUT /api/auth/bookings/:id/add-spa
+// @access  Private
+exports.addSpaToBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { amount, transactionId } = req.body;
+        const booking = await Booking.findOne({ _id: id, user: req.user._id });
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        const hasSpa = booking.addOns.some(a => a.name.toLowerCase().includes('spa'));
+        if (hasSpa) {
+            return res.status(400).json({ message: 'Spa service already added to this booking' });
+        }
+
+        // Add spa to addOns
+        booking.addOns.push({
+            name: 'Spa Session (60 min)',
+            price: amount,
+            usageStatus: 'unused'
+        });
+
+        // Update total price
+        booking.totalPrice += amount;
+        await booking.save();
+
+        // Record payment
+        const payment = new Payment({
+            user: req.user._id,
+            booking: booking._id,
+            amount,
+            method: 'Online / Razorpay',
+            status: 'Success',
+            transactionId: transactionId || `SPA-${Date.now()}`
+        });
+        await payment.save();
+
+        await Notification.create({
+            user: req.user._id,
+            recipientRole: 'user',
+            type: 'System',
+            message: `Spa treatment added to your booking #${booking._id.toString().slice(-6)}. Our team will contact you for scheduling.`
+        });
+
+        res.json({ message: 'Spa added successfully', booking });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -804,3 +804,45 @@ exports.sendSpecialOfferBlast = async (req, res) => {
     }
 };
 
+// @desc    Assign spa schedule for a booking
+// @route   PUT /api/auth/admin/bookings/:id/spa-schedule
+// @access  Admin Only
+exports.updateSpaSchedule = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { spaSchedule, amenityName } = req.body;
+        const booking = await Booking.findById(id).populate('user', 'fullName email');
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        // Validate date
+        const scheduleDate = new Date(spaSchedule);
+        if (scheduleDate < new Date(booking.checkIn) || scheduleDate > new Date(booking.checkOut)) {
+            return res.status(400).json({ message: 'Spa schedule must be within the stay period' });
+        }
+
+        const amenity = booking.addOns.find(a => a.name === amenityName);
+        if (!amenity) {
+            return res.status(404).json({ message: 'Spa amenity not found in this booking' });
+        }
+
+        amenity.spaSchedule = scheduleDate;
+        await booking.save();
+
+        // Notify User
+        await Notification.create({
+            user: booking.user._id,
+            recipientRole: 'user',
+            type: 'System',
+            message: `Your spa session for booking #${booking._id.toString().slice(-6)} has been scheduled for ${scheduleDate.toLocaleString()}.`,
+            status: 'Success'
+        });
+
+        res.json({ message: 'Spa schedule updated', booking });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+

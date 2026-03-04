@@ -19,7 +19,9 @@ const {
     checkInBooking,
     checkOutBooking,
     getAllBookings,
-    saveGuestDetails
+    saveGuestDetails,
+    updateAmenityUsage,
+    addSpaToBooking
 } = require('../controllers/userController');
 const {
     createStaffAccount,
@@ -51,7 +53,8 @@ const {
     createCoupon,
     updateCoupon,
     deleteCoupon,
-    sendSpecialOfferBlast
+    sendSpecialOfferBlast,
+    updateSpaSchedule
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const { createMembershipOrder, verifyMembershipPayment, getMyMembership } = require('../controllers/membershipController');
@@ -76,6 +79,8 @@ router.put('/notifications/:id/read', protect, markUserNotificationRead);
 router.delete('/notifications/clear', protect, clearUserNotifications);
 router.put('/bookings/:id/check-in', protect, checkInBooking);
 router.put('/bookings/:id/check-out', protect, checkOutBooking);
+router.put('/bookings/:id/amenities/:amenityName/use', protect, updateAmenityUsage);
+router.put('/bookings/:id/add-spa', protect, addSpaToBooking);
 
 // --- Membership Routes ---
 router.post('/membership/create-order', protect, createMembershipOrder);
@@ -118,6 +123,7 @@ router.get('/admin/stats', protect, admin, getDashboardStats);
 router.put('/admin/bookings/:id/check-in', protect, admin, adminCheckInBooking);
 router.put('/admin/bookings/:id/check-out', protect, admin, adminCheckOutBooking);
 router.put('/admin/bookings/:id/cancel', protect, admin, adminCancelBooking);
+router.put('/admin/bookings/:id/spa-schedule', protect, admin, updateSpaSchedule);
 
 // --- Admin Marketing ---
 router.post('/admin/send-offer', protect, admin, sendSpecialOfferBlast);

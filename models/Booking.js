@@ -84,7 +84,20 @@ const bookingSchema = new mongoose.Schema({
     originalPrice: {
         type: Number,
         default: 0
-    }
+    },
+    addOns: [{
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        usageStatus: {
+            type: String,
+            enum: ['unused', 'used'],
+            default: 'unused'
+        },
+        spaSchedule: {
+            type: Date,
+            default: null
+        }
+    }]
 }, {
     timestamps: true
 });
