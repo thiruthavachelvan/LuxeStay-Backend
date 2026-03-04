@@ -1,5 +1,6 @@
 const Support = require('../models/Support');
 const Notification = require('../models/Notification');
+const emailService = require('../utils/emailService');
 
 // @desc    Create a support query
 // @route   POST /api/support/submit
@@ -147,6 +148,10 @@ exports.respondToQuery = async (req, res) => {
                 status: 'Success'
             });
 
+            // Trigger Service Resolution Email (Async)
+            const user = await require('../models/User').findById(query.user);
+            emailService.sendServiceResolutionEmail({ type: query.subject, response: query.adminResponse }, user);
+
             res.json(updatedQuery);
         } else {
             res.status(404).json({ message: 'Query not found' });
@@ -228,6 +233,10 @@ exports.completeServiceRequest = async (req, res) => {
             user: request.user,
             status: 'Success'
         });
+
+        // Trigger Service Resolution Email (Async)
+        const user = await require('../models/User').findById(request.user);
+        emailService.sendServiceResolutionEmail({ type: request.subject, response: 'Service request completed by staff.' }, user);
 
         // Notify admin
         await Notification.create({

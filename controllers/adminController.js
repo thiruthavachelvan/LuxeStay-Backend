@@ -7,6 +7,7 @@ const Booking = require('../models/Booking');
 const Payment = require('../models/Payment');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const emailService = require('../utils/emailService');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -537,6 +538,9 @@ exports.updateFoodOrderStatus = async (req, res) => {
                 user: updatedOrder.user._id,
                 status: 'Success'
             });
+
+            // Trigger Food Order Delivery Email
+            emailService.sendOrderDeliveredEmail(updatedOrder, updatedOrder.user);
         }
 
         res.json({
@@ -774,3 +778,29 @@ exports.clearNotifications = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// @desc    Admin sends a special offer email to all users
+// @route   POST /api/auth/admin/send-offer
+// @access  Admin Only
+exports.sendSpecialOfferBlast = async (req, res) => {
+    try {
+        const { title, description, code } = req.body;
+
+        if (!title || !description || !code) {
+            return res.status(400).json({ message: 'Title, description, and code are required' });
+        }
+
+        const users = await User.find({ role: 'resident' }); // Only send to residents
+
+        // Use Promise.all to send in parallel, but be mindful of rate limits if the user base is huge
+        // For this project, parallel is fine.
+        await Promise.all(users.map(user =>
+            emailService.sendSpecialOfferEmail(user, { title, description, code })
+        ));
+
+        res.json({ message: `Successfully sent offer blast to ${users.length} users.` });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+

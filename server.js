@@ -1,7 +1,9 @@
+const dotenv = require('dotenv');
+dotenv.config({ override: true });
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const supportRoutes = require('./routes/supportRoutes');
 const publicRoutes = require('./routes/publicRoutes');
@@ -9,8 +11,6 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
-
-dotenv.config();
 
 const app = express();
 

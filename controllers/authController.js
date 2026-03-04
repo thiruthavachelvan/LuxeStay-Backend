@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const jwt = require('jsonwebtoken');
+const emailService = require('../utils/emailService');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -26,6 +27,9 @@ exports.registerUser = async (req, res) => {
         });
 
         if (user) {
+            // Trigger Welcome Email (Async)
+            emailService.sendWelcomeEmail(user).catch(err => console.error(`Welcome email failed:`, err));
+
             res.status(201).json({
                 _id: user._id,
                 email: user.email,

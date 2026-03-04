@@ -3,6 +3,7 @@ const Booking = require('../models/Booking');
 const Notification = require('../models/Notification');
 const FoodOrder = require('../models/FoodOrder');
 const Payment = require('../models/Payment');
+const emailService = require('../utils/emailService');
 
 // @desc    Get user profile
 // @route   GET /api/auth/profile
@@ -132,6 +133,10 @@ exports.cancelBooking = async (req, res) => {
             message: `Booking ${booking._id} cancelled. Refund: ₹${refundAmount} (${refundPercentage}% of ₹${paidAmount}).`,
             status: 'Urgent'
         });
+
+        // Trigger Cancellation Email (Async)
+        const populatedBooking = await Booking.findById(booking._id).populate('user', 'fullName email');
+        emailService.sendCancellationEmail(populatedBooking);
 
         res.json({
             ...updatedBooking.toObject(),
@@ -343,7 +348,10 @@ exports.completeMyOrder = async (req, res) => {
             status: 'Info'
         });
 
-        const updatedOrder = await FoodOrder.findById(order._id)
+        // Trigger Order Delivered Email (Async)
+        emailService.sendOrderDeliveredEmail(order, order.user);
+
+        const updatedOrderFull = await FoodOrder.findById(order._id)
             .populate('user', 'email')
             .populate('items.menuItem', 'name price image');
 
@@ -449,8 +457,16 @@ exports.createBooking = async (req, res) => {
             user: req.user._id,
             recipientRole: 'admin',
             type: 'New Booking',
-            message: `New booking received.`
+            message: `New booking received.`,
+            status: 'Info'
         });
+
+        // Trigger Booking Confirmation Email (Async)
+        const populatedBooking = await Booking.findById(createdBooking._id)
+            .populate('user', 'fullName email')
+            .populate('location', 'city')
+            .populate('room', 'type');
+        emailService.sendBookingConfirmation(populatedBooking);
 
         res.status(201).json(createdBooking);
     } catch (error) {
