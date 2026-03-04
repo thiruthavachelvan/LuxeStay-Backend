@@ -1,5 +1,6 @@
 const Contact = require('../models/Contact');
 const Notification = require('../models/Notification');
+const emailService = require('../utils/emailService');
 
 // @desc    Submit a contact form message (public)
 // @route   POST /api/contact
@@ -54,6 +55,37 @@ exports.updateContactStatus = async (req, res) => {
         );
         if (!contact) return res.status(404).json({ message: 'Contact message not found.' });
         res.json({ message: 'Message updated', contact });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Admin replies to contact message
+// @route   POST /api/contact/admin/:id/reply
+// @access  Private/Admin
+exports.replyToContact = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { reply } = req.body;
+
+        if (!reply) {
+            return res.status(400).json({ message: 'Reply text is required.' });
+        }
+
+        const contact = await Contact.findById(id);
+
+        if (!contact) {
+            return res.status(404).json({ message: 'Contact message not found.' });
+        }
+
+        contact.status = 'Replied';
+        contact.adminReply = reply;
+        await contact.save();
+
+        // Send Email
+        await emailService.sendContactReplyEmail(contact, reply);
+
+        res.json({ message: 'Reply sent successfully', contact });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

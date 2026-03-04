@@ -276,3 +276,19 @@ exports.sendSpaPurchaseEmail = async (user, booking, amount, transactionId) => {
     `;
     await sendEmail({ to: user.email, subject: 'LuxeStay: Spa Booking Invoice', html });
 };
+
+exports.sendContactReplyEmail = async (contact, replyText) => {
+    const html = `
+        <div style="font-family: 'sans-serif'; color: #333; max-width: 600px; margin: auto; border: 1px solid #d4af37; padding: 40px; background-color: #0f1626; color: #ffffff;">
+            <h2 style="color: #d4af37; text-align: center;">Response to Your Inquiry</h2>
+            <p>Dear ${contact.name},</p>
+            <p>Thank you for contacting LuxeStay. Here is the response to your message regarding "<strong>${contact.subject}</strong>":</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin: 20px 0; font-style: italic;">
+                <p>${replyText}</p>
+            </div>
+            <p>If you have any further questions, please feel free to reply to this email or contact us again through our website.</p>
+            <p style="margin-top: 40px; font-size: 12px; color: #888; text-align: center;">Warm Regards,<br>LuxeStay Support Team</p>
+        </div>
+    `;
+    await sendEmail({ to: contact.email, subject: `Re: ${contact.subject} - LuxeStay Support`, html });
+};
