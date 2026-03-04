@@ -656,6 +656,7 @@ exports.addSpaToBooking = async (req, res) => {
         const supportQuery = await Support.create({
             user: booking.user._id,
             location: booking.location?._id,
+            booking: booking._id,
             subject: 'Spa Appointment Request',
             message: `Payment received for Spa Session (₹${amount}). Please coordinate with guest ${booking.user.fullName || booking.user.email} (Booking #${booking._id.toString().slice(-6)}) to schedule their appointment.`,
             status: 'Open',

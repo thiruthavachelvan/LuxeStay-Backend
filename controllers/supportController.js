@@ -75,6 +75,7 @@ exports.getAllQueries = async (req, res) => {
             .populate('user', 'fullName email')
             .populate('assignedTo', 'email role')
             .populate('location', 'city')
+            .populate('booking', 'checkIn checkOut')
             .sort({ createdAt: -1 });
         res.json(queries);
     } catch (error) {

@@ -10,6 +10,10 @@ const supportSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Location'
     },
+    booking: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Booking'
+    },
     subject: {
         type: String,
         required: true
