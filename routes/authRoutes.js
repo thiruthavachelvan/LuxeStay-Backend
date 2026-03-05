@@ -58,9 +58,13 @@ const {
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const { createMembershipOrder, verifyMembershipPayment, getMyMembership } = require('../controllers/membershipController');
+const { forgotPassword, verifyOtp, resetPassword } = require('../controllers/authController');
 
 router.post('/signup', registerUser);
 router.post('/login', loginUser);
+router.post('/forgot-password', forgotPassword);
+router.post('/verify-otp', verifyOtp);
+router.post('/reset-password', resetPassword);
 
 // --- User Routes ---
 router.get('/profile', protect, getUserProfile);

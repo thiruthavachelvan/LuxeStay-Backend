@@ -463,3 +463,69 @@ exports.sendContactReplyEmail = async (contact, replyText) => {
     `;
     await sendEmail({ to: contact.email, subject: `Re: ${contact.subject} - LuxeStay Support`, html });
 };
+
+// ------------------------------------------------------------------
+// Password Reset Emails
+// ------------------------------------------------------------------
+
+exports.sendPasswordResetOTPEmail = async (user, otp) => {
+    const html = `
+        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #0f1626; color: #fff; padding: 20px; text-align: center;">
+                <h1 style="margin: 0; font-size: 24px; color: #d4af37;">LuxeStay Hotels & Resorts</h1>
+            </div>
+            <div style="padding: 30px;">
+                <h2 style="color: #0f1626; margin-top: 0;">Password Reset Request</h2>
+                <p style="font-size: 16px; line-height: 1.5;">Hello ${user.fullName || 'Valued Guest'},</p>
+                <p style="font-size: 16px; line-height: 1.5;">We received a request to reset your password. Here is your One-Time Password (OTP) to proceed:</p>
+                
+                <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; text-align: center; margin: 30px 0;">
+                    <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #0f1626;">${otp}</span>
+                </div>
+                
+                <p style="font-size: 16px; line-height: 1.5; color: #d32f2f;"><strong>Note:</strong> This OTP is valid for the next 10 minutes. Please do not share this code with anyone.</p>
+                <p style="font-size: 16px; line-height: 1.5;">If you did not request a password reset, please ignore this email or contact support if you have concerns.</p>
+                
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+                <p style="font-size: 14px; color: #777; margin-bottom: 0;">Thank you,<br/>The LuxeStay Team</p>
+            </div>
+            <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 12px; color: #888;">
+                &copy; ${new Date().getFullYear()} LuxeStay Hotels & Resorts. All rights reserved.
+            </div>
+        </div>
+    `;
+
+    return sendEmail({
+        to: user.email,
+        subject: 'LuxeStay - Password Reset OTP',
+        html,
+    });
+};
+
+exports.sendPasswordResetSuccessEmail = async (user) => {
+    const html = `
+        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #0f1626; color: #fff; padding: 20px; text-align: center;">
+                <h1 style="margin: 0; font-size: 24px; color: #d4af37;">LuxeStay Hotels & Resorts</h1>
+            </div>
+            <div style="padding: 30px;">
+                <h2 style="color: #0f1626; margin-top: 0;">Password Successfully Reset</h2>
+                <p style="font-size: 16px; line-height: 1.5;">Hello ${user.fullName || 'Valued Guest'},</p>
+                <p style="font-size: 16px; line-height: 1.5;">Your LuxeStay account password has been successfully reset. You can now use your new password to log in.</p>
+                <p style="font-size: 16px; line-height: 1.5;">If you did not perform this action, please contact our support team immediately.</p>
+                
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+                <p style="font-size: 14px; color: #777; margin-bottom: 0;">Thank you,<br/>The LuxeStay Team</p>
+            </div>
+            <div style="background-color: #f5f5f5; padding: 15px; text-align: center; font-size: 12px; color: #888;">
+                &copy; ${new Date().getFullYear()} LuxeStay Hotels & Resorts. All rights reserved.
+            </div>
+        </div>
+    `;
+
+    return sendEmail({
+        to: user.email,
+        subject: 'LuxeStay - Password Reset Successful',
+        html,
+    });
+};

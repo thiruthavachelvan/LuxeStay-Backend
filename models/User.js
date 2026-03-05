@@ -56,6 +56,14 @@ const userSchema = new mongoose.Schema({
     staffPassword: {
         type: String,
         required: false
+    },
+    resetPasswordOtp: {
+        type: String,
+        required: false
+    },
+    resetPasswordOtpExpire: {
+        type: Date,
+        required: false
     }
 }, { timestamps: true });
 
