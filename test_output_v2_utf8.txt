@@ -1,0 +1,14 @@
+﻿[dotenv@17.3.1] injecting env (7) from .env -- tip: ≡ƒñû agentic secret storage: https://dotenvx.com/as2
+--- Email Delivery Diagnostics ---
+Target: thirukumar3210@gmail.com
+From: thiruthavachelvan@gmail.com
+
+1. Attempting Simple Text Email...
+Email sent successfully to thirukumar3210@gmail.com
+Welcome Email triggered.
+
+2. Attempting PDF Manifest Email...
+Email sent successfully to thirukumar3210@gmail.com
+Booking Confirmation triggered.
+
+Check console for "Email sent successfully" messages.
