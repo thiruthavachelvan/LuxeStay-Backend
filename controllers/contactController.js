@@ -13,7 +13,13 @@ exports.submitContactForm = async (req, res) => {
             return res.status(400).json({ message: 'All fields are required.' });
         }
 
-        const contact = await Contact.create({ name, email, subject, message });
+        const contact = await Contact.create({
+            name,
+            email,
+            subject,
+            message,
+            user: req.user ? req.user._id : null
+        });
 
         // Notify admin
         await Notification.create({
@@ -86,6 +92,33 @@ exports.replyToContact = async (req, res) => {
         await emailService.sendContactReplyEmail(contact, reply);
 
         res.json({ message: 'Reply sent successfully', contact });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete contact form message (Admin)
+// @route   DELETE /api/contact/admin/:id
+// @access  Private/Admin
+exports.deleteContact = async (req, res) => {
+    try {
+        const contact = await Contact.findByIdAndDelete(req.params.id);
+        if (!contact) return res.status(404).json({ message: 'Contact message not found.' });
+        res.json({ message: 'Message erased from archives' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+// @desc    Delete OWN contact message (User)
+// @route   DELETE /api/contact/my/:id
+// @access  Private
+exports.deleteMyContact = async (req, res) => {
+    try {
+        const contact = await Contact.findOne({ _id: req.params.id, user: req.user._id });
+        if (!contact) return res.status(404).json({ message: 'Message not found or not authorized to delete.' });
+
+        await Contact.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Message removed from your stream' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

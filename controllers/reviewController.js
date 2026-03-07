@@ -166,7 +166,7 @@ exports.getAllReviewsAdmin = async (req, res) => {
     try {
         const reviews = await Review.find()
             .populate('user', 'fullName email')
-            .populate('booking', 'checkInDate checkOutDate')
+            .populate('booking', 'checkIn checkOut')
             .sort({ createdAt: -1 });
         res.json(reviews);
     } catch (error) {

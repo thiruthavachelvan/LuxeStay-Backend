@@ -63,7 +63,7 @@ exports.getMyBookings = async (req, res) => {
     try {
         const bookings = await Booking.find({ user: req.user._id })
             .populate('location', 'city image')
-            .populate('room', 'roomType roomNumber')
+            .populate('room', 'type roomNumber')
             .sort({ checkIn: -1 });
         res.json(bookings);
     } catch (error) {
@@ -329,6 +329,9 @@ exports.completeMyOrder = async (req, res) => {
         order.status = 'Delivered';
         await order.save();
 
+        // Populate user to ensure emailService has the email
+        await order.populate('user', 'fullName email');
+
         // Notify user that order was delivered
         await Notification.create({
             type: 'Order',
@@ -355,7 +358,7 @@ exports.completeMyOrder = async (req, res) => {
             .populate('user', 'email')
             .populate('items.menuItem', 'name price image');
 
-        res.json({ message: 'Order marked as delivered', order: updatedOrder });
+        res.json({ message: 'Order marked as delivered', order: updatedOrderFull });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -470,8 +473,13 @@ exports.createBooking = async (req, res) => {
                 populate: { path: 'membership' }
             })
             .populate('location', 'city name')
-            .populate('room', 'type name');
-        emailService.sendBookingConfirmation(populatedBooking);
+            .populate('room', 'type roomNumber');
+
+        if (populatedBooking && populatedBooking.user) {
+            emailService.sendBookingConfirmation(populatedBooking);
+        } else {
+            console.warn('Booking confirmation email not sent: User or Booking not found after creation.');
+        }
 
         res.status(201).json(createdBooking);
     } catch (error) {
