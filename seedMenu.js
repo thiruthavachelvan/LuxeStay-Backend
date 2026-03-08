@@ -24,7 +24,7 @@ const seedMenu = async () => {
                 price: 350,
                 category: "Breakfast",
                 dietaryType: "Veg",
-                image: "https://images.unsplash.com/photo-1630406184470-7fd4440e626a?auto=format&fit=crop&q=80",
+                image: "https://images.unsplash.com/photo-1630406184470-7fd4440e626a?q=80&w=2000&auto=format&fit=crop",
                 calories: 420,
                 preparationTime: "12 mins",
                 availableAt: locationIds
@@ -35,7 +35,7 @@ const seedMenu = async () => {
                 price: 280,
                 category: "Breakfast",
                 dietaryType: "Veg",
-                image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=80",
+                image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=2000&auto=format&fit=crop",
                 calories: 320,
                 preparationTime: "10 mins",
                 availableAt: locationIds
@@ -46,7 +46,7 @@ const seedMenu = async () => {
                 price: 320,
                 category: "Breakfast",
                 dietaryType: "Veg",
-                image: "https://images.unsplash.com/photo-1606491956689-2ea8c5369512?auto=format&fit=crop&q=80",
+                image: "https://images.unsplash.com/photo-1606491956689-2ea8c5369512?q=80&w=2000&auto=format&fit=crop",
                 calories: 550,
                 preparationTime: "15 mins",
                 availableAt: locationIds
@@ -57,6 +57,7 @@ const seedMenu = async () => {
                 price: 290,
                 category: "Breakfast",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1516714435131-44dfd5eaa5cb?q=80&w=2000&auto=format&fit=crop",
                 calories: 380,
                 preparationTime: "12 mins",
                 availableAt: locationIds
@@ -67,6 +68,7 @@ const seedMenu = async () => {
                 price: 240,
                 category: "Breakfast",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1626074353765-517a681e40be?q=80&w=2000&auto=format&fit=crop",
                 calories: 220,
                 preparationTime: "8 mins",
                 availableAt: locationIds
@@ -77,6 +79,7 @@ const seedMenu = async () => {
                 price: 380,
                 category: "Breakfast",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1596797038558-9640844139d1?q=80&w=2000&auto=format&fit=crop",
                 calories: 650,
                 preparationTime: "15 mins",
                 availableAt: locationIds
@@ -90,7 +93,7 @@ const seedMenu = async () => {
                 category: "Lunch",
                 dietaryType: "Non-Veg",
                 isSpecial: true,
-                image: "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?auto=format&fit=crop&q=80",
+                image: "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?q=80&w=2000&auto=format&fit=crop",
                 calories: 820,
                 preparationTime: "25 mins",
                 availableAt: locationIds
@@ -101,7 +104,7 @@ const seedMenu = async () => {
                 price: 580,
                 category: "Lunch",
                 dietaryType: "Non-Veg",
-                image: "https://images.unsplash.com/photo-1603894584202-933259bb499b?auto=format&fit=crop&q=80",
+                image: "https://images.unsplash.com/photo-1603894584202-933259bb499b?q=80&w=2000&auto=format&fit=crop",
                 calories: 740,
                 preparationTime: "20 mins",
                 availableAt: locationIds
@@ -112,6 +115,7 @@ const seedMenu = async () => {
                 price: 480,
                 category: "Lunch",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=2000&auto=format&fit=crop",
                 calories: 520,
                 preparationTime: "18 mins",
                 availableAt: locationIds
@@ -122,6 +126,7 @@ const seedMenu = async () => {
                 price: 520,
                 category: "Lunch",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1601050690597-df056fb1d99a?q=80&w=2000&auto=format&fit=crop",
                 calories: 580,
                 preparationTime: "22 mins",
                 availableAt: locationIds
@@ -132,6 +137,7 @@ const seedMenu = async () => {
                 price: 590,
                 category: "Lunch",
                 dietaryType: "Non-Veg",
+                image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?q=80&w=2000&auto=format&fit=crop",
                 calories: 610,
                 preparationTime: "25 mins",
                 availableAt: locationIds
@@ -145,7 +151,7 @@ const seedMenu = async () => {
                 category: "Dinner",
                 dietaryType: "Non-Veg",
                 isSpecial: true,
-                image: "https://images.unsplash.com/photo-1542382257-80dedb725088?auto=format&fit=crop&q=80",
+                image: "https://images.unsplash.com/photo-1542382257-80dedb725088?q=80&w=2000&auto=format&fit=crop",
                 calories: 680,
                 preparationTime: "30 mins",
                 availableAt: locationIds
@@ -156,6 +162,7 @@ const seedMenu = async () => {
                 price: 640,
                 category: "Dinner",
                 dietaryType: "Non-Veg",
+                image: "https://images.unsplash.com/photo-1626509653295-465cc7f11ca8?q=80&w=2000&auto=format&fit=crop",
                 calories: 450,
                 preparationTime: "25 mins",
                 availableAt: locationIds
@@ -167,6 +174,7 @@ const seedMenu = async () => {
                 category: "Dinner",
                 dietaryType: "Veg",
                 isComplimentary: true,
+                image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=2000&auto=format&fit=crop",
                 calories: 410,
                 preparationTime: "10 mins",
                 availableAt: locationIds
@@ -177,6 +185,7 @@ const seedMenu = async () => {
                 price: 460,
                 category: "Dinner",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1618449840665-9ed506d73a34?q=80&w=2000&auto=format&fit=crop",
                 calories: 430,
                 preparationTime: "15 mins",
                 availableAt: locationIds
@@ -188,6 +197,7 @@ const seedMenu = async () => {
                 category: "Dinner",
                 dietaryType: "Non-Veg",
                 isSpecial: true,
+                image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=2000&auto=format&fit=crop",
                 calories: 890,
                 preparationTime: "25 mins",
                 availableAt: locationIds
@@ -201,6 +211,7 @@ const seedMenu = async () => {
                 category: "Weekend Buffet",
                 dietaryType: "Veg",
                 isSpecial: true,
+                image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=2000&auto=format&fit=crop",
                 availableAt: locationIds
             },
             {
@@ -210,6 +221,7 @@ const seedMenu = async () => {
                 category: "Weekend Buffet",
                 dietaryType: "Non-Veg",
                 isSpecial: true,
+                image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=2000&auto=format&fit=crop",
                 availableAt: locationIds
             },
 
@@ -220,6 +232,7 @@ const seedMenu = async () => {
                 price: 150,
                 category: "Beverages",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1580915411954-282cb1b0d780?q=80&w=2000&auto=format&fit=crop",
                 calories: 120,
                 preparationTime: "5 mins",
                 availableAt: locationIds
@@ -230,6 +243,7 @@ const seedMenu = async () => {
                 price: 220,
                 category: "Beverages",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=2000&auto=format&fit=crop",
                 calories: 280,
                 preparationTime: "8 mins",
                 availableAt: locationIds
@@ -240,6 +254,7 @@ const seedMenu = async () => {
                 price: 120,
                 category: "Beverages",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1544787210-28209c3bf79c?q=80&w=2000&auto=format&fit=crop",
                 calories: 80,
                 preparationTime: "5 mins",
                 availableAt: locationIds
@@ -252,6 +267,7 @@ const seedMenu = async () => {
                 price: 180,
                 category: "Desserts",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1589119908995-c6837fa14848?q=80&w=2000&auto=format&fit=crop",
                 calories: 320,
                 preparationTime: "5 mins",
                 availableAt: locationIds
@@ -262,6 +278,7 @@ const seedMenu = async () => {
                 price: 240,
                 category: "Desserts",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1636130932026-66f8da35c4bc?q=80&w=2000&auto=format&fit=crop",
                 calories: 260,
                 preparationTime: "5 mins",
                 availableAt: locationIds
@@ -274,6 +291,7 @@ const seedMenu = async () => {
                 price: 450,
                 category: "Bar Menu",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1575037614876-c38556f2e82b?q=80&w=2000&auto=format&fit=crop",
                 availableAt: locationIds
             },
             {
@@ -282,6 +300,7 @@ const seedMenu = async () => {
                 price: 380,
                 category: "Bar Menu",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2000&auto=format&fit=crop",
                 availableAt: locationIds
             },
 
@@ -292,6 +311,7 @@ const seedMenu = async () => {
                 price: 550,
                 category: "In-Room Dining",
                 dietaryType: "Non-Veg",
+                image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=2000&auto=format&fit=crop",
                 preparationTime: "30 mins",
                 availableAt: locationIds
             },
@@ -301,6 +321,7 @@ const seedMenu = async () => {
                 price: 380,
                 category: "In-Room Dining",
                 dietaryType: "Veg",
+                image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?q=80&w=2000&auto=format&fit=crop",
                 preparationTime: "20 mins",
                 availableAt: locationIds
             }
