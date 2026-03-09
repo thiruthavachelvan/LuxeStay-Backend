@@ -8,6 +8,7 @@ const Payment = require('../models/Payment');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const emailService = require('../utils/emailService');
+const Review = require('../models/Review');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -845,4 +846,42 @@ exports.updateSpaSchedule = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// --- Guest Review Management (Admin) ---
+
+// @desc    Get all reviews for admin moderation
+// @route   GET /api/auth/admin/reviews
+// @access  Admin Only
+exports.getAdminReviews = async (req, res) => {
+    try {
+        const reviews = await Review.find()
+            .populate('user', 'fullName email')
+            .populate('booking', 'checkIn checkOut')
+            .sort({ createdAt: -1 });
+        res.json(reviews);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete a review permanently
+// @route   DELETE /api/auth/admin/reviews/:id
+// @access  Admin Only
+exports.deleteReviewAdmin = async (req, res) => {
+    const { id } = req.params;
+    console.log(`[ADMIN] Attempting to purge review ID: ${id}`);
+    try {
+        const review = await Review.findByIdAndDelete(id);
+        if (!review) {
+            console.warn(`[ADMIN] Purge failed: Review ${id} not found in registry.`);
+            return res.status(404).json({ message: 'Review not found in the global registry' });
+        }
+        console.log(`[ADMIN] Review ${id} purged successfully.`);
+        res.json({ message: 'Testimonial successfully purged from archives.' });
+    } catch (error) {
+        console.error(`[ADMIN] Purge Error: ${error.message}`);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 

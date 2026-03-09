@@ -159,35 +159,3 @@ exports.checkReview = async (req, res) => {
     }
 };
 
-// @desc    Get all reviews (Admin)
-// @route   GET /api/reviews/admin/all
-// @access  Private/Admin
-exports.getAllReviewsAdmin = async (req, res) => {
-    try {
-        const reviews = await Review.find()
-            .populate('user', 'fullName email')
-            .populate('booking', 'checkIn checkOut')
-            .sort({ createdAt: -1 });
-        res.json(reviews);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// @desc    Approve/reject a review (Admin)
-// @route   PUT /api/reviews/admin/:id/status
-// @access  Private/Admin
-exports.updateReviewStatus = async (req, res) => {
-    try {
-        const { status } = req.body;
-        const review = await Review.findByIdAndUpdate(
-            req.params.id,
-            { status },
-            { new: true }
-        );
-        if (!review) return res.status(404).json({ message: 'Review not found' });
-        res.json({ message: `Review ${status}`, review });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};

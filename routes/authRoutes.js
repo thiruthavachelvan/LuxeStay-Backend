@@ -54,7 +54,9 @@ const {
     updateCoupon,
     deleteCoupon,
     sendSpecialOfferBlast,
-    updateSpaSchedule
+    updateSpaSchedule,
+    getAdminReviews,
+    deleteReviewAdmin
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const { createMembershipOrder, verifyMembershipPayment, getMyMembership } = require('../controllers/membershipController');
@@ -137,5 +139,9 @@ router.get('/admin/coupons', protect, admin, getCoupons);
 router.post('/admin/coupons', protect, admin, createCoupon);
 router.put('/admin/coupons/:id', protect, admin, updateCoupon);
 router.delete('/admin/coupons/:id', protect, admin, deleteCoupon);
+
+// --- Admin Review Routes ---
+router.get('/admin/reviews', protect, admin, getAdminReviews);
+router.delete('/admin/reviews/:id', protect, admin, deleteReviewAdmin);
 
 module.exports = router;

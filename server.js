@@ -55,6 +55,9 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/payment', paymentRoutes);
 
+// Heartbeat route to verify server is alive and reloading
+app.get('/api/heartbeat', (req, res) => res.json({ status: 'Luxury Operational', time: new Date() }));
+
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI, {
     serverSelectionTimeoutMS: 5000,
